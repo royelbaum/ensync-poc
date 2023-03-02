@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calypso-sidecar
+  labels:
+    app: calypso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calypso
+  template:
+    metadata:
+      labels:
+        app: calypso
+    spec:
+      volumes:
+        - name: main-app-volume
+          emptyDir:
+            medium: Memory
+        - name: athenz-certs
+          emptyDir:
+            medium: Memory
+        - name: share-folder
+          emptyDir:
+            medium: Memory
+      containers:
+        - name: mainapp
+          image: mainapp-image
+          imagePullPolicy: Never
+          volumeMounts:
+            - mountPath: "/var/lib/sia"
+              name: main-app-volume
+            - mountPath: "/var/run/athenz"
+              name: athenz-certs
+            - mountPath: "/var/tmp"
+              name: share-folder
+        - name: calypso
+          image: calypso-image
+          imagePullPolicy: Never
+          volumeMounts:
+            - mountPath: "/var/tmp"
+              name: share-folder
+
+
+
+
+
+
+
